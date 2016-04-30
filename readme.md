@@ -18,7 +18,7 @@
     * .equalsNum(double condicio)
     * .moreThan(double condicio)
     * .lessThan(double condicio)
-    * .between(condicio)
+    * .between(double condicioInici, double condicioFinal)
   * .toString()                 -> genera un String amb la sortida. (inclou la capçalera (nom camps/alias) si s'ha seleccionat)
   * .toString(char separador)   -> genera un String amb la sortida amb el separador que desitgem
   * .print()                    -> imprimeix per pantalla la sortida de la consulta (sempre es mostra la capçalera (nom camps/alias)
@@ -27,15 +27,11 @@
   * .avg(String|int Camp)       -> retorna la mitjana (en double) del camp indicat al resultat de la consulta
   * .sum(String|int Camp)       -> retorna la suma del camp indicat al resultat de la consulta
 
-### Notes
+###Notes
 * Les columnes comencen per 0.
 
-### To-do
+####To-do
 
 * .toFile(nom-arxiu.dat)      -> guardar la sortida a un arxiu
 * .join(Dba, camp)            -> unir dos Dba's. Donar una sortida igualant el camp indicat de les dues.
 * Controlar més errors. Afegir excepcions i missatges d'error.
-* ~~Per l'examen: separar valors per commas i que puguin contenir " ".~~
-
-fixme:
-* ~~.toString() totalment desactualitzat. S'ha d'agafar el print() com a exemple i refer-ho.~~

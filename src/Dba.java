@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class Dba {
+    private static char separadorMilers = '.';
+    private static char separadorDecimals = ',';
 
     private String from = "";
     private int[] select = null;
@@ -243,7 +245,7 @@ public class Dba {
                             if (strings[w.camp].equals("\\n")) { // Si es null, el trec de la llista
                                 aBorrar.add(strings);
                             } else {
-                                double aComparar = Double.parseDouble(strings[w.camp]);
+                                double aComparar = toDouble(strings[w.camp]);
                                 if (aComparar == w.condicioDouble) {
                                     aBorrar.add(strings);
                                 }
@@ -258,7 +260,7 @@ public class Dba {
                             if (strings[w.camp].equals("\\n")) { // Si es null, el trec de la llista
                                 aBorrar.add(strings);
                             } else {
-                                double aComparar = Double.parseDouble(strings[w.camp]);
+                                double aComparar = toDouble(strings[w.camp]);
                                 if (aComparar <= w.condicioDouble) {
                                     aBorrar.add(strings);
                                 }
@@ -273,7 +275,7 @@ public class Dba {
                             if (strings[w.camp].equals("\\n")) { // Si es null, el trec de la llista
                                 aBorrar.add(strings);
                             } else {
-                                double aComparar = Double.parseDouble(strings[w.camp]);
+                                double aComparar = toDouble(strings[w.camp]);
                                 if (aComparar >= w.condicioDouble) {
                                     aBorrar.add(strings);
                                 }
@@ -307,6 +309,7 @@ public class Dba {
         }
 
 
+
         return true;
     }
 
@@ -316,8 +319,27 @@ public class Dba {
      * @param str possible número dins d'un string
      * @return true si es numeric, fals si no ho és
      */
-    private static boolean esNumeric(String str) {
-        return str.matches("-?\\d+(\\.\\d+)?");  //pot agafar un - i un decimal.
+    private boolean esNumeric(String str) {
+        return str.matches("-?("+separadorMilers+"?\\d+)+("+separadorDecimals+"\\d+)?");
+    }
+
+    /**
+     *
+     * @param strNumeric String a convertir a double
+     * @return el número en format double
+     */
+    private static double toDouble(String strNumeric) {
+        strNumeric = strNumeric.replaceAll("\\"+String.valueOf(separadorMilers), "");
+        return Double.parseDouble(strNumeric.replace(separadorDecimals, '.'));
+    }
+
+    /**
+     *
+     * @param strNumeric String a convertir a int
+     * @return el número en format int
+     */
+    private int toInt(String strNumeric) {
+        return Integer.parseInt(strNumeric.replaceAll("\\"+String.valueOf(separadorMilers), ""));
     }
 
     /**
@@ -549,7 +571,7 @@ public class Dba {
         double actual;
         for (String[] linia : consulta) {
             if (esNumeric(linia[camp])) {
-                actual = Double.parseDouble(linia[camp]);
+                actual = toDouble(linia[camp]);
                 if (max) {
                     if (actual > tmp)
                         tmp = actual;
@@ -635,7 +657,7 @@ public class Dba {
                 double total = 0;
                 for (String[] linia : consulta) {
                     if (esNumeric(linia[camp])) {
-                        total += Double.parseDouble(linia[camp]);
+                        total += toDouble(linia[camp]);
                     } else {
                         System.err.println("Error: el camp " + nomsCamps[camp] + " no es numeric");
                         return 0;
@@ -651,7 +673,7 @@ public class Dba {
                 double total = 0;
                 for (String[] linia : consulta) {
                     if (esNumeric(linia[camp])) {
-                        total += Double.parseDouble(linia[camp]);
+                        total += toDouble(linia[camp]);
                     } else {
                         System.err.println("Error: el camp " + nomsCamps[camp] + " no es numeric");
                         return 0;
@@ -682,7 +704,7 @@ public class Dba {
                 double total = 0;
                 for (String[] linia : consulta) {
                     if (esNumeric(linia[camp])) {
-                        total += Double.parseDouble(linia[camp]);
+                        total += toDouble(linia[camp]);
                     } else {
                         System.err.println("Error: el camp " + nomsCamps[camp] + " no es numeric");
                         return 0;
@@ -698,7 +720,7 @@ public class Dba {
                 double total = 0;
                 for (String[] linia : consulta) {
                     if (esNumeric(linia[camp])) {
-                        total += Double.parseDouble(linia[camp]);
+                        total += toDouble(linia[camp]);
                     } else {
                         System.err.println("Error: el camp " + nomsCamps[camp] + " no es numeric");
                         return 0;
@@ -735,7 +757,7 @@ public class Dba {
                     return 1;
 //                    return Integer.MAX_VALUE;
                 if (tipusCamps[camp] == TIPUS_DADA.NUMERIC)
-                    return (int)(Double.parseDouble(str1[camp]) - Double.parseDouble(str2[camp])); // per numeric
+                    return (int)(toDouble(str1[camp]) - toDouble(str2[camp])); // per numeric
                 else // if (tipusCamps[camp] == TIPUS_DADA.TEXT)
                     return str1[camp].compareTo(str2[camp]); // per Strings
             }
