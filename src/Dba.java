@@ -6,8 +6,8 @@ import java.util.Comparator;
 public class Dba {
 
     // ----- Configuració -------
-    private static char separadorMilers = '.';
-    private static char separadorDecimals = ',';
+    private static char separadorMilers = ',';
+    private static char separadorDecimals = '.';
 
     private char separadorEntrada = ',';
     private char possibleDelimitadorCampsEntrada = '\"';
@@ -27,7 +27,7 @@ public class Dba {
 
     private int[] select = null;
 
-    private boolean capcalera = true;
+    private boolean capcalera = false;
 
     private ArrayList<String[]> consulta;
 
@@ -46,7 +46,7 @@ public class Dba {
         select = null;
         separadorSortida = ',';
         separadorEntrada = ',';
-        capcalera = true;
+        capcalera = false;
         consulta = new ArrayList<>();
         wheres = new ArrayList<>();
         orderBys = new ArrayList<>();

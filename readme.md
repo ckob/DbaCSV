@@ -7,7 +7,7 @@
   * .select(int1, int2,... num camp)        -> camps a seleccionar numericament (no case sensitive)
   * .capcalera(true|false)      -> Indica si volem mostrar la capçalera (els noms dels camps) o no
   * .as(string1, string2... nomAlias)       -> alias a mostrar com a camps
-  * .separador(string|char sep) -> a utilitzar com a separdor per a la sortida (per defecte es una tabulació)
+  * .separador(string|char sep) -> a utilitzar com a separdor per a la sortida (per defecte es una coma)
   * .orderBy(String|int camp)   -> ordena ASCendentment la sortida aportant el nº/nom de camp (accepta els orderBy's que vulguis)
   * .orderAscBy(String|int camp)-> ordena ASCendentment la sortida aportant el nº/nom de camp (accepta els orderBy's que vulguis)
   * .orderDescBy()              -> ordena DESCendentment la sortida aportant el nº/nom de camp (accepta els orderBy's que vulguis)
@@ -35,5 +35,7 @@
 
 ####To-do
 
+* .update
+* .delete
 * .join(Dba, camp)            -> unir dos Dba's. Donar una sortida igualant el camp indicat de les dues.
 * Controlar més errors. Afegir excepcions i missatges d'error.
