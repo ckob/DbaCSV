@@ -1,4 +1,5 @@
 #CSVDba
+##[Exemples a la wiki](https://github.com/ckob/DbaCSV/wiki)
 ###Funcions
 * new Dba(String nom-database)  -> nom de la base de dades que ha d'estar a dins de la carpeta ddbb (o el que s'especifiqui a la configuració)
   * .from(String taula.         -> arxiu (taula) dins de la base de dades especificada abans
