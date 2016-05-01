@@ -330,40 +330,35 @@ public class Dba {
     @Override
     public String toString() {
         if (treball()) {
-
-            if (!consulta.isEmpty()) {
-                String str = "";
-                if (capcalera) {
-                    String[] aliasCampsAmbNulls;
-                    if (aliasCamps != null) {
-                        aliasCampsAmbNulls = new String[nomsCamps.length];
-                        for (int i = 0; i < aliasCamps.length; i++) {
-                            aliasCampsAmbNulls[i] = aliasCamps[i];
-                        }
+            String str = "";
+            if (capcalera) {
+                String[] aliasCampsAmbNulls;
+                if (aliasCamps != null) {
+                    aliasCampsAmbNulls = new String[nomsCamps.length];
+                    for (int i = 0; i < aliasCamps.length; i++) {
+                        aliasCampsAmbNulls[i] = aliasCamps[i];
+                    }
+                } else {
+                    aliasCampsAmbNulls = null;
+                }
+                int aux = 0;
+                for (int i : select) {
+                    if (aliasCampsAmbNulls == null || aliasCampsAmbNulls[aux] == null) {
+                        str += nomsCamps[i] + separadorSortida;
                     } else {
-                        aliasCampsAmbNulls = null;
+                        str += aliasCampsAmbNulls[aux] + separadorSortida;
                     }
-                    int aux = 0;
-                    for (int i : select) {
-                        if (aliasCampsAmbNulls == null || aliasCampsAmbNulls[aux] == null) {
-                            str += nomsCamps[i] + separadorSortida;
-                        } else {
-                            str += aliasCampsAmbNulls[aux] + separadorSortida;
-                        }
-                        aux++;
-                    }
-                    str = str.substring(0, str.length() - 1) + "\n"; // Borro l'ultim separador de sortida. (1 caracter de longitud)
+                    aux++;
                 }
-                for (String[] fila : consulta) {
-                    for (int i : select) {
-                        str += fila[i] + separadorSortida;
-                    }
-                    str = str.substring(0, str.length() - 1) + "\n";
-                }
-                return str.substring(0, str.length() - 1);
-            } else {
-                return "La consulta no ha produït cap resultat.";
+                str = str.substring(0, str.length() - 1) + "\n"; // Borro l'ultim separador de sortida. (1 caracter de longitud)
             }
+            for (String[] fila : consulta) {
+                for (int i : select) {
+                    str += fila[i] + separadorSortida;
+                }
+                str = str.substring(0, str.length() - 1) + "\n";
+            }
+            return str.substring(0, str.length() - 1);
         } else {
             return "S'ha produït un error.";
         }
@@ -380,110 +375,109 @@ public class Dba {
      */
     public void print() {
         if (treball()) {
-            if (!consulta.isEmpty()) {
-                String[] aliasCampsAmbNulls;
-                if (aliasCamps != null) {
-                    aliasCampsAmbNulls = new String[nomsCamps.length];
-                    for (int i = 0; i < aliasCamps.length; i++) {
-                        aliasCampsAmbNulls[i] = aliasCamps[i];
-                    }
+            String[] aliasCampsAmbNulls;
+            if (aliasCamps != null) {
+                aliasCampsAmbNulls = new String[nomsCamps.length];
+                for (int i = 0; i < aliasCamps.length; i++) {
+                    aliasCampsAmbNulls[i] = aliasCamps[i];
+                }
+            } else {
+                aliasCampsAmbNulls = null;
+            }
+
+            int[] maxLengthCamps = new int[nomsCamps.length];
+            int aux = 0;
+            for (int i : select) {
+                if (aliasCampsAmbNulls == null || aliasCampsAmbNulls[aux] == null) {
+                    maxLengthCamps[i] = nomsCamps[i].length();
                 } else {
-                    aliasCampsAmbNulls = null;
+                    maxLengthCamps[i] = aliasCampsAmbNulls[aux].length();
                 }
+                aux++;
+            }
 
-                int[] maxLengthCamps = new int[nomsCamps.length];
-                int aux = 0;
+            for (String[] linia : consulta) {
                 for (int i : select) {
-                    if (aliasCampsAmbNulls == null || aliasCampsAmbNulls[aux] == null) {
-                        maxLengthCamps[i] = nomsCamps[i].length();
-                    } else {
-                        maxLengthCamps[i] = aliasCampsAmbNulls[aux].length();
-                    }
-                    aux++;
-                }
-
-                for (String[] linia : consulta) {
-                    for (int i : select) {
-                        if (linia[i].length() > maxLengthCamps[i]) {
-                            maxLengthCamps[i] = linia[i].length();
-                        }
+                    if (linia[i].length() > maxLengthCamps[i]) {
+                        maxLengthCamps[i] = linia[i].length();
                     }
                 }
-                String filaSeparadora = "";
-                for (int i : select) {
-                    filaSeparadora += "+";
-                    if (maxLengthCamps[i] > 0) {
-                        for (int j = 0; j < maxLengthCamps[i]; j++) {
-                            filaSeparadora += "-";
-                        }
-                    }
-                }
+            }
+            String filaSeparadora = "";
+            for (int i : select) {
                 filaSeparadora += "+";
-
-                String str = "" + filaSeparadora + "\n" + "|";
-                aux = 0;
-                for (int i : select) {
-                    if (aliasCampsAmbNulls == null || aliasCampsAmbNulls[aux] == null) {
-                        str += encaixarStrAMida(nomsCamps[i], maxLengthCamps[i], TIPUS_JUSTIFICACIO.CENTRAT) + "|";
-                    } else {
-                        str += encaixarStrAMida(aliasCampsAmbNulls[aux], maxLengthCamps[i], TIPUS_JUSTIFICACIO.CENTRAT) + "|";
+                if (maxLengthCamps[i] > 0) {
+                    for (int j = 0; j < maxLengthCamps[i]; j++) {
+                        filaSeparadora += "-";
                     }
-                    aux++;
                 }
+            }
+            filaSeparadora += "+";
 
-                // Fila única per afegir a sota dels noms/alias dels camps. Per poder indicar si s'ha ordenat per algun camp:
-                if (!orderBys.isEmpty()) {
-                    String filaUnica = "";
-                    OrderBy[] arrOrderBy = new OrderBy[nomsCamps.length];
-                    for (OrderBy orderBy : orderBys) {
-                        arrOrderBy[orderBy.camp] = orderBy;
-                    }
-                    for (int i : select) {
-                        filaUnica += "+";
-                        if (maxLengthCamps[i] > 0) {
-                            if (arrOrderBy[i] != null) {
-                                for (int j = 0; j < maxLengthCamps[i]; j++) {
-                                    if ((maxLengthCamps[i]) / 2 == j) {
-                                        if (arrOrderBy[i].asc) {
+            String str = "" + filaSeparadora + "\n" + "|";
+            aux = 0;
+            for (int i : select) {
+                if (aliasCampsAmbNulls == null || aliasCampsAmbNulls[aux] == null) {
+                    str += encaixarStrAMida(nomsCamps[i], maxLengthCamps[i], TIPUS_JUSTIFICACIO.CENTRAT) + "|";
+                } else {
+                    str += encaixarStrAMida(aliasCampsAmbNulls[aux], maxLengthCamps[i], TIPUS_JUSTIFICACIO.CENTRAT) + "|";
+                }
+                aux++;
+            }
+
+            // Fila única per afegir a sota dels noms/alias dels camps. Per poder indicar si s'ha ordenat per algun camp:
+            if (!orderBys.isEmpty()) {
+                String filaUnica = "";
+                OrderBy[] arrOrderBy = new OrderBy[nomsCamps.length];
+                for (OrderBy orderBy : orderBys) {
+                    arrOrderBy[orderBy.camp] = orderBy;
+                }
+                for (int i : select) {
+                    filaUnica += "+";
+                    if (maxLengthCamps[i] > 0) {
+                        if (arrOrderBy[i] != null) {
+                            for (int j = 0; j < maxLengthCamps[i]; j++) {
+                                if ((maxLengthCamps[i]) / 2 == j) {
+                                    if (arrOrderBy[i].asc) {
 //                                                filaUnica+="/\\";
-                                            filaUnica += "△";
-                                            j++;
-                                        } else {
+                                        filaUnica += "△";
+                                        j++;
+                                    } else {
 //                                                filaUnica+="\\/";
-                                            filaUnica += "▽";
-                                            j++;
-                                        }
+                                        filaUnica += "▽";
+                                        j++;
                                     }
-                                    filaUnica += "-";
                                 }
-                            } else {
-                                for (int j = 0; j < maxLengthCamps[i]; j++) {
-                                    filaUnica += "-";
-                                }
+                                filaUnica += "-";
+                            }
+                        } else {
+                            for (int j = 0; j < maxLengthCamps[i]; j++) {
+                                filaUnica += "-";
                             }
                         }
                     }
-                    filaUnica += "+";
-                    str += "\n" + filaUnica + "\n";
-                } else {
-                    str += "\n" + filaSeparadora + "\n";
                 }
-
-                for (String[] fila : consulta) {
-                    str += "|";
-                    for (int i : select) {
-                        if (tipusCamps[i] == TIPUS_DADA.NUMERIC) {
-                            str += encaixarStrAMida(fila[i], maxLengthCamps[i], TIPUS_JUSTIFICACIO.DRETA) + "|";
-                        } else {
-                            str += encaixarStrAMida(fila[i], maxLengthCamps[i], TIPUS_JUSTIFICACIO.ESQUERRA) + "|";
-                        }
-                    }
-                    str += "\n" + filaSeparadora + "\n";
-                }
-                System.out.println(str);
+                filaUnica += "+";
+                str += "\n" + filaUnica + "\n";
             } else {
-                System.out.println("La consulta no ha produït cap resultat.");
+                str += "\n" + filaSeparadora + "\n";
             }
+
+            for (String[] fila : consulta) {
+                str += "|";
+                for (int i : select) {
+                    if (tipusCamps[i] == TIPUS_DADA.NUMERIC) {
+                        str += encaixarStrAMida(fila[i], maxLengthCamps[i], TIPUS_JUSTIFICACIO.DRETA) + "|";
+                    } else {
+                        str += encaixarStrAMida(fila[i], maxLengthCamps[i], TIPUS_JUSTIFICACIO.ESQUERRA) + "|";
+                    }
+                }
+                //str += "\n" + filaSeparadora + "\n"; // Per separar molt més les files entre ells
+                str += "\n";
+            }
+            //str +=  filaSeparadora + "\n";
+            str += "("+count()+" rows)";
+            System.out.println(str);
         } else {
             System.out.println("S'ha produït un error.");
         }
