@@ -6,23 +6,25 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class Dba {
+
+    // Configuració
     private static char separadorMilers = '.';
     private static char separadorDecimals = ',';
 
-    private String from = "";
-    private int[] select = null;
-
-    //private String separadorEntradaRegex = "\\s+";
-    //private String separadorEntradaRegex = ",";
     private char separadorEntrada = ',';
-
-    //    private String possibleDelimitadorCampsEntrada = "\"";
     private char possibleDelimitadorCampsEntrada = '\"';
 
-//    private String separadorSortida = ",";
-    private char separadorSortida = ',';
+    private char separadorSortida = separadorEntrada;
+    private char possibleDelimitadorCampsSortida = possibleDelimitadorCampsEntrada;
+
+    private String tipusNull = "\\N"; // Valor per escriure que un camp es null. (També es pot deixar senzillament sense re)
+
+    private String from = "";
+
+    private int[] select = null;
 
     private boolean capcalera = true;
+
     private ArrayList<String[]> consulta;
 
     private String[] nomsCamps;
@@ -38,10 +40,7 @@ public class Dba {
     public Dba reset() {
         from = "";
         select = null;
-//        separadorSortida = "\t";
         separadorSortida = '\t';
-        //separadorEntradaRegex = "\\s+";
-        //separadorEntradaRegex = ",";
         separadorEntrada = ',';
         capcalera = true;
         consulta = new ArrayList<>();
@@ -125,18 +124,6 @@ public class Dba {
         return this;
     }
 
-
-    /**
-     * Modifiquem el separadorSortida per defecte.
-     *
-     * @param separador Separador per a la sortida per String.
-     * @return Objecte Dba amb el separadorSortida modificat.
-     */
-//    public Dba separadorSortida(String separador) {
-//        this.separadorSortida = separador;
-//        return this;
-//    }
-
     /**
      * Modifiquem el separadorSortida per defecte.
      *
@@ -153,7 +140,7 @@ public class Dba {
      * @param fila un string separat amb estil csv
      * @return array de Strings amb un valor per cada camp separat correctament.
      */
-    public String[] filaCsvToArrString(String fila) {
+    private String[] filaCsvToArrString(String fila) {
         ArrayList<String> strings = new ArrayList<>();
         String str = "";
         boolean entreCometes = false;
@@ -195,14 +182,12 @@ public class Dba {
             String actualLine;
             br = new BufferedReader(new FileReader(from));
             nomsCamps = filaCsvToArrString(br.readLine());
-            //nomsCamps = br.readLine().split(separadorEntradaRegex, -1);
             tipusCamps = new TIPUS_DADA[nomsCamps.length];
             while ((actualLine = br.readLine()) != null) {
-                //String[] linia = actualLine.split(separadorEntradaRegex, -1); // el -1 es perque també agafi els camps que no tenen res. ex: "asd",,,"asd". Agafara els 2 del mig també
                 String[] linia = filaCsvToArrString(actualLine);
                 for (int i = 0; i < linia.length; i++) { // Per comprovar el tipus de dades que té cada camp
                     if (tipusCamps[i] != TIPUS_DADA.TEXT) { // TODO: 17/04/16 AFEGIR TIPUS DATA (FECHA) ? (per ordenar no cal, ja que el format yyyy-mm-dd permet fer-ho per string)
-                        if (esNumeric(linia[i]) || linia[i].equals("\\N") || linia[i].isEmpty()) {
+                        if (esNumeric(linia[i]) || linia[i].equals(tipusNull) || linia[i].isEmpty()) {
                             tipusCamps[i] = TIPUS_DADA.NUMERIC;
                         } else {
                             tipusCamps[i] = TIPUS_DADA.TEXT;
@@ -242,7 +227,7 @@ public class Dba {
 
                     if (w.type == TIPUS_WHERE.EQUALS_NUMERIC) {
                         if (tipusCamps[w.camp] == TIPUS_DADA.NUMERIC) {
-                            if (strings[w.camp].equals("\\n")) { // Si es null, el trec de la llista
+                            if (strings[w.camp].isEmpty() || strings[w.camp].equals(tipusNull)) { // Si es null, el trec de la llista
                                 aBorrar.add(strings);
                             } else {
                                 double aComparar = toDouble(strings[w.camp]);
@@ -257,7 +242,7 @@ public class Dba {
                     }
                     if (w.type == TIPUS_WHERE.MORE_THAN) {
                         if (tipusCamps[w.camp] == TIPUS_DADA.NUMERIC) {
-                            if (strings[w.camp].equals("\\n")) { // Si es null, el trec de la llista
+                            if (strings[w.camp].isEmpty() || strings[w.camp].equals(tipusNull)) { // Si es null, el trec de la llista
                                 aBorrar.add(strings);
                             } else {
                                 double aComparar = toDouble(strings[w.camp]);
@@ -272,7 +257,7 @@ public class Dba {
                     }
                     if (w.type == TIPUS_WHERE.LESS_THAN) {
                         if (tipusCamps[w.camp] == TIPUS_DADA.NUMERIC) {
-                            if (strings[w.camp].equals("\\n")) { // Si es null, el trec de la llista
+                            if (strings[w.camp].isEmpty() || strings[w.camp].equals(tipusNull)) { // Si es null, el trec de la llista
                                 aBorrar.add(strings);
                             } else {
                                 double aComparar = toDouble(strings[w.camp]);
@@ -301,15 +286,12 @@ public class Dba {
             }
         }
 
-        if (select == null) {
+        if (select == null) { // Si el select es null, vol dir que seleccioan tots els camps
             select = new int[nomsCamps.length];
             for (int i = 0; i < nomsCamps.length; i++) {
                 select[i] = i;
             }
         }
-
-
-
         return true;
     }
 
@@ -370,17 +352,14 @@ public class Dba {
                         }
                         aux++;
                     }
-//                    str = str.substring(0, str.length() - separadorSortida.length()) + "\n";
-                    str = str.substring(0, str.length() - 1) + "\n";
+                    str = str.substring(0, str.length() - 1) + "\n"; // Borro l'ultim separador de sortida. (1 caracter de longitud)
                 }
                 for (String[] fila : consulta) {
                     for (int i : select) {
                         str += fila[i] + separadorSortida;
                     }
-//                    str = str.substring(0, str.length() - separadorSortida.length()) + "\n";
                     str = str.substring(0, str.length() - 1) + "\n";
                 }
-//                return str.substring(0, str.length() - separadorSortida.length());
                 return str.substring(0, str.length() - 1);
             } else {
                 return "La consulta no ha produït cap resultat.";
@@ -455,8 +434,6 @@ public class Dba {
                 // Fila única per afegir a sota dels noms/alias dels camps. Per poder indicar si s'ha ordenat per algun camp:
                 if (!orderBys.isEmpty()) {
                     String filaUnica = "";
-                    boolean ordenat = false;
-                    //for (int i = 0; i < maxLengthCamps.length; i++) {
                     OrderBy[] arrOrderBy = new OrderBy[nomsCamps.length];
                     for (OrderBy orderBy : orderBys) {
                         arrOrderBy[orderBy.camp] = orderBy;
@@ -560,7 +537,7 @@ public class Dba {
     }
 
     /**
-     * Funció interna per reutilitzar codi. Es pasa com a argument el camp a obtenir i
+     * Funció interna per reutilitzar codi. Es pasa com a argument el camp a obtenir i si volem obtenir el maxim o el minim
      *
      * @param camp el camp a buscar
      * @param max  true si volem obtenir el valor máxim. Fals si volem el mínim.
@@ -750,10 +727,10 @@ public class Dba {
         Collections.sort(consulta, new Comparator<String[]>() {
             @Override
             public int compare(String[] str1, String[] str2) {
-                if (str1[camp].isEmpty() || str1[camp].equals("\\N"))
+                if (str1[camp].isEmpty() || str1[camp].equals(tipusNull))
                     return -1;
 //                    return Integer.MIN_VALUE;
-                if (str2[camp].isEmpty() || str2[camp].equals("\\N"))
+                if (str2[camp].isEmpty() || str2[camp].equals(tipusNull))
                     return 1;
 //                    return Integer.MAX_VALUE;
                 if (tipusCamps[camp] == TIPUS_DADA.NUMERIC)

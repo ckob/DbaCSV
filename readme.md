@@ -26,6 +26,7 @@
   * .min(String|int Camp)       -> retorna el nombre més petit (en double) del camp indicat al resultat de la consulta
   * .avg(String|int Camp)       -> retorna la mitjana (en double) del camp indicat al resultat de la consulta
   * .sum(String|int Camp)       -> retorna la suma del camp indicat al resultat de la consulta
+  * .count()                    -> retorna el nombre de linies que ha generat la consulta
 
 ###Notes
 * Les columnes comencen per 0.
@@ -34,4 +35,5 @@
 
 * .toFile(nom-arxiu.dat)      -> guardar la sortida a un arxiu
 * .join(Dba, camp)            -> unir dos Dba's. Donar una sortida igualant el camp indicat de les dues.
+* .insert
 * Controlar més errors. Afegir excepcions i missatges d'error.
