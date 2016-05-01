@@ -27,6 +27,9 @@
   * .avg(String|int Camp)       -> retorna la mitjana (en double) del camp indicat al resultat de la consulta
   * .sum(String|int Camp)       -> retorna la suma del camp indicat al resultat de la consulta
   * .count()                    -> retorna el nombre de linies que ha generat la consulta
+  * .insertInto(ruta-arxiu.dat) -> inicia l'intenció de insertar quelcom. Aquesta acció sobreescriurá l'arxiu per insertar-hi dades!
+    * [.camps(String camps)]    -> indica els camps dels valors que introduirem a continuació. Es pot utilitzar en qualsevol ordre.
+    * .values(String valors)    -> els valors que volem introduir. En l'ordre de la "base de dades" o en l'ordre especifiat amb .camps().
 
 ###Notes
 * Les columnes comencen per 0.

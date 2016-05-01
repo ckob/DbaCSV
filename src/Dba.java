@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,7 +38,7 @@ public class Dba {
     public Dba reset() {
         from = "";
         select = null;
-        separadorSortida = '\t';
+        separadorSortida = ',';
         separadorEntrada = ',';
         capcalera = true;
         consulta = new ArrayList<>();
@@ -769,6 +767,8 @@ public class Dba {
     }
 
 
+
+
     public class Where {
         private Dba dba;
         private int camp;
@@ -900,6 +900,123 @@ public class Dba {
             this.asc = asc;
         }
     }
+
+    /**
+     * Guarda els resultats d'una consulta a un arxiu, en format csv
+     * @param arxiu on es guardarà la consulta
+     * @return true si tot ha anat bé
+     */
+    public boolean toFile(String arxiu) {
+        PrintWriter pw = null;
+        try {
+            pw = new PrintWriter(new BufferedWriter(new FileWriter(arxiu)));
+            pw.println(filaArrCsvToString(nomsCamps)); // imprimeixo els noms dels camps a l'arxiu
+            for (String[] fila : consulta) {
+                pw.println(filaArrCsvToString(fila));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (pw!=null) {
+                try {
+                    pw.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Converteix una fila d'array d'strings en una fila en fomat CSV String
+     * @param fila en format array d'strings
+     * @return el String en format csv
+     */
+    private String filaArrCsvToString (String[] fila) {
+        String str="";
+        for (String s : fila) {
+            if (s!=null) {
+                if (!s.isEmpty()) {
+                    if (s.indexOf(separadorSortida) >= 0 || s.indexOf(possibleDelimitadorCampsSortida) >= 0) { // Si hi ha quelcom que pugui donar problemes ...
+                        s = s.replace(String.valueOf(possibleDelimitadorCampsSortida), String.valueOf(possibleDelimitadorCampsSortida) + String.valueOf(possibleDelimitadorCampsSortida)); // Duplico les, segurament, cometes dobles
+                        s = possibleDelimitadorCampsSortida + s + possibleDelimitadorCampsSortida;
+                    }
+                }
+            } else {
+                s="";
+            }
+            str+=s+separadorSortida;
+        }
+        return str.substring(0, str.length()-1); // trec l'ultima coma
+    }
+
+    /**
+     * Métode intern per a realitzar un insert
+     * @param insertObj objecte Insert que conte els valors a insertar i on han d'anar
+     * @return true si tot ha anat bé
+     */
+    private boolean doInsert(Insert insertObj) {
+        if (treball()) {
+            if (insertObj.camps==null) { // S'han introduït els valors directament, sense especificar a on van,
+                if(insertObj.valors.length == nomsCamps.length) { // En cas de que el nombre de valors introudits sigui el correcte...
+                    consulta.add(insertObj.valors);
+                } else {
+                    System.err.println("Nombre de camps incorrecte. Han d'haver-hi "+nomsCamps.length+" camps. O bé utilitzar .camps(nomsCamps) abans per especificar quins camps vols introduïr.");
+                    return false;
+                }
+            } else {
+                if (insertObj.camps.length == insertObj.valors.length) {
+                    String[] tmp = new String[nomsCamps.length];
+                    int[] numCamps = nomCampsStringToInt(insertObj.camps);
+                    for (int i = 0; i < numCamps.length; i++) {
+                        tmp[numCamps[i]] = insertObj.valors[i];
+                    }
+                    consulta.add(tmp);
+                } else {
+                    System.err.println("Nombre de camps o de valors incorrecte. Han d'haver-hi la mateixa cantitat de camps que de valors.");
+                    return false;
+                }
+            }
+
+            if (toFile(from)) {
+                System.out.println("INSERT 0 1");
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            System.err.println("S'ha produit un error");
+            return false;
+        }
+    }
+
+    public class Insert {
+        private String fitxer;
+        private String[] valors;
+        private String[] camps;
+
+        private Insert(Dba dba, String fitxer) {
+            dba.reset();
+            from=fitxer;
+            this.camps=null;
+        }
+        public Insert camps(String... camps) {
+            this.camps=camps;
+            return this;
+        }
+        public Insert values(String... valors) {
+            this.valors=valors;
+            doInsert(this);
+            return this;
+            //return this.dba;
+        }
+    }
+    public Insert insertInto(String fitxer) {
+        return new Insert(this, fitxer);
+    }
+
+
 
     /**
      * enum per organitzar els tipus de dades
