@@ -5,7 +5,7 @@ import java.util.Comparator;
 
 public class Dba {
 
-    // Configuració
+    // ----- Configuració -------
     private static char separadorMilers = '.';
     private static char separadorDecimals = ',';
 
@@ -15,9 +15,15 @@ public class Dba {
     private char separadorSortida = separadorEntrada;
     private char possibleDelimitadorCampsSortida = possibleDelimitadorCampsEntrada;
 
-    private String tipusNull = "\\N"; // Valor per escriure que un camp es null. (També es pot deixar senzillament sense re)
+    private String tipusNull = "\\N"; // Valor per detectar que un camp es null. (Al document també es pot deixar senzillament sense re (millor))
 
-    private String from = "";
+    final private static String carpetaSchema = "databases";
+    // --------------------------
+
+    final private static String separadorSistema = java.io.File.separator;
+
+    private String database = "";
+    private String from = ""; // contindrá la ruta completa
 
     private int[] select = null;
 
@@ -48,21 +54,17 @@ public class Dba {
         return this;
     }
 
-    public Dba() {
+
+    public Dba(String database) {
         consulta = new ArrayList<>();
         wheres = new ArrayList<>();
         orderBys = new ArrayList<>();
+        this.database = database;
     }
 
-    public Dba(String from) {
-        consulta = new ArrayList<>();
-        wheres = new ArrayList<>();
-        orderBys = new ArrayList<>();
-        this.from = from;
-    }
-
-    public Dba from(String ruta) {
-        this.from = ruta;
+    public Dba from(String taula) {
+        reset();
+        this.from = carpetaSchema+separadorSistema+database+separadorSistema+taula;
         return this;
     }
 
@@ -300,7 +302,7 @@ public class Dba {
      * @return true si es numeric, fals si no ho és
      */
     private boolean esNumeric(String str) {
-        return str.matches("-?("+separadorMilers+"?\\d+)+("+separadorDecimals+"\\d+)?");
+        return str.matches("-?(\\"+separadorMilers+"?\\d+)+("+separadorDecimals+"\\d+)?");
     }
 
     /**
@@ -998,7 +1000,7 @@ public class Dba {
 
         private Insert(Dba dba, String fitxer) {
             dba.reset();
-            from=fitxer;
+            from(fitxer);
             this.camps=null;
         }
         public Insert camps(String... camps) {

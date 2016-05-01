@@ -1,8 +1,7 @@
 #CSVDba
 ###Funcions
-* new Dba()
-* new Dba(ruta-arxiu.dat)
-  * .from(ruta-arxiu.dat)
+* new Dba(String nom-database)  -> nom de la base de dades que ha d'estar a dins de la carpeta ddbb (o el que s'especifiqui a la configuració)
+  * .from(String taula.         -> arxiu (taula) dins de la base de dades especificada abans
   * .selectAll()                -> no necessari, si no s'especifica res, es selecciona tot
   * .select(string1, string2, nom camp)     -> camps a seleccionar en text (no case sensitive)
   * .select(int1, int2,... num camp)        -> camps a seleccionar numericament (no case sensitive)
@@ -36,7 +35,5 @@
 
 ####To-do
 
-* .toFile(nom-arxiu.dat)      -> guardar la sortida a un arxiu
 * .join(Dba, camp)            -> unir dos Dba's. Donar una sortida igualant el camp indicat de les dues.
-* .insert
 * Controlar més errors. Afegir excepcions i missatges d'error.
