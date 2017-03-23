@@ -1,6 +1,6 @@
-#CSVDba
-##[Exemples a la wiki](https://github.com/ckob/DbaCSV/wiki)
-###Funcions
+# CSVDba
+## [Exemples a la wiki](https://github.com/ckob/DbaCSV/wiki)
+### Funcions
 * new Dba(String nom-database)  -> nom de la base de dades que ha d'estar a dins de la carpeta ddbb (o el que s'especifiqui a la configuració)
   * .from(String taula.         -> arxiu (taula) dins de la base de dades especificada abans
   * .selectAll()                -> no necessari, si no s'especifica res, es selecciona tot
@@ -31,10 +31,10 @@
     * [.camps(String camps)]    -> indica els camps dels valors que introduirem a continuació. Es pot utilitzar en qualsevol ordre.
     * .values(String valors)    -> els valors que volem introduir. En l'ordre de la "base de dades" o en l'ordre especifiat amb .camps().
 
-###Notes
+### Notes
 * Les columnes comencen per 0.
 
-####To-do
+#### To-do
 
 * .update
 * .delete
